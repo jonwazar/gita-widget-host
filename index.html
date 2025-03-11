@@ -19,6 +19,13 @@
             window.myChatWidget.load({
               id: 'e761eaba-1df0-43a6-a413-3f7e3455505f',
             });
+
+            // Ensure the widget fully expands after loading
+            setTimeout(function() {
+              if (window.myChatWidget && typeof window.myChatWidget.open === 'function') {
+                window.myChatWidget.open();
+              }
+            }, 2000); // Delay to ensure widget initializes properly
           }
         };
         v.src = "https://agentivehub.com/production.bundle.min.js";
