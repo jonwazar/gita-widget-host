@@ -111,11 +111,11 @@
 
                 console.log("✅ API Response:", response.data);
 
-                if (response.data.messages && response.data.messages.length > 0) {
-                    const botReply = response.data.messages[0]?.content || "⚠️ No response text.";
-                    addMessage("Bot", botReply);
+                // Correctly extract the response
+                if (response.data.content) {
+                    addMessage("Bot", response.data.content);
                 } else {
-                    addMessage("Bot", "⚠️ No response received from AI.");
+                    addMessage("Bot", "⚠️ No response received.");
                 }
             } catch (error) {
                 console.error("❌ Error sending message:", error.response ? error.response.data : error);
