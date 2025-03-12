@@ -6,7 +6,6 @@
     <title>Full-Page Chat</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
-        /* Ensure full-page chat layout */
         html, body {
             margin: 0;
             padding: 0;
@@ -19,7 +18,6 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Chat container */
         #chat-container {
             width: 100vw;
             height: 100vh;
@@ -27,7 +25,6 @@
             flex-direction: column;
         }
 
-        /* Chat messages */
         #chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -35,14 +32,12 @@
             background: white;
         }
 
-        /* Input area */
         #chat-input {
             display: flex;
             padding: 10px;
             background: #ddd;
         }
 
-        /* Input field */
         #user-message {
             flex: 1;
             padding: 10px;
@@ -51,7 +46,6 @@
             font-size: 16px;
         }
 
-        /* Send button */
         #send-button {
             margin-left: 10px;
             padding: 10px 15px;
@@ -65,7 +59,6 @@
 </head>
 <body>
 
-    <!-- Chat UI -->
     <div id="chat-container">
         <div id="chat-messages"></div>
         <div id="chat-input">
@@ -81,24 +74,29 @@
 
         async function startChatSession() {
             try {
+                console.log("🔵 Starting chat session...");
                 const response = await axios.post(
                     'https://agentivehub.com/api/chat/session',
                     { api_key, assistant_id }
                 );
+
                 session_id = response.data.session_id;
-                console.log("Session started:", session_id);
+                console.log("✅ Chat session started:", session_id);
             } catch (error) {
-                console.error("Error starting session:", error);
+                console.error("❌ Error starting session:", error.response ? error.response.data : error);
             }
         }
 
         async function sendMessage(userMessage) {
-            if (!session_id) return;
+            if (!session_id) {
+                console.error("❌ No session ID. Chat session not started.");
+                return;
+            }
 
-            // Append user message to chat
             addMessage("You", userMessage);
 
             try {
+                console.log("🔵 Sending message:", userMessage);
                 const response = await axios.post(
                     'https://agentivehub.com/api/chat',
                     {
@@ -110,12 +108,17 @@
                     }
                 );
 
-                // Append bot response to chat
-                const botReply = response.data.messages[0].content;
-                addMessage("Bot", botReply);
+                console.log("✅ API Response:", response.data);
+
+                if (response.data.messages && response.data.messages.length > 0) {
+                    const botReply = response.data.messages[0].content;
+                    addMessage("Bot", botReply);
+                } else {
+                    addMessage("Bot", "⚠️ No response received from AI.");
+                }
             } catch (error) {
-                console.error("Error sending message:", error);
-                addMessage("Bot", "⚠️ Error: Unable to send message.");
+                console.error("❌ Error sending message:", error.response ? error.response.data : error);
+                addMessage("Bot", `⚠️ Error: ${error.response ? error.response.data.error : "Unable to send message."}`);
             }
         }
 
