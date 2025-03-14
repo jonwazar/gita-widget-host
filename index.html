@@ -8,30 +8,23 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            padding: 20px;
+            text-align: center;
         }
         #chat-container {
-            width: 90%;
             max-width: 600px;
-            background: white;
+            margin: auto;
+            background: #f4f4f4;
             padding: 20px;
+            border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
         }
         #chat-box {
             height: 400px;
             overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: white;
         }
         .message {
             padding: 8px;
@@ -39,16 +32,17 @@
             border-radius: 5px;
         }
         .user {
-            background-color: #d1e7dd;
-            align-self: flex-end;
+            background: #d1e7dd;
+            text-align: right;
         }
         .ai {
-            background-color: #e9ecef;
-            align-self: flex-start;
+            background: #e9ecef;
+            text-align: left;
         }
         #input-container {
             display: flex;
             gap: 10px;
+            margin-top: 10px;
         }
         input {
             flex-grow: 1;
@@ -57,7 +51,7 @@
             border-radius: 5px;
         }
         button {
-            padding: 10px 15px;
+            padding: 10px;
             border: none;
             background: #007bff;
             color: white;
@@ -70,50 +64,43 @@
     </style>
 </head>
 <body>
+    <h1>AI Chat</h1>
     <div id="chat-container">
         <div id="chat-box"></div>
         <div id="input-container">
-            <input type="text" id="user-input" placeholder="Type a message...">
+            <input type="text" id="user-input" placeholder="Type a message..." />
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
-    
+
     <script>
         async function sendMessage() {
             const inputField = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
             const userMessage = inputField.value.trim();
-            
-            if (userMessage === '') return;
-            
+
+            if (!userMessage) return;
+
             // Display user message
-            const userDiv = document.createElement('div');
-            userDiv.classList.add('message', 'user');
-            userDiv.textContent = userMessage;
-            chatBox.appendChild(userDiv);
+            chatBox.innerHTML += `<p class="message user"><strong>You:</strong> ${userMessage}</p>`;
             inputField.value = '';
-            
-            // Send message to backend
+
             try {
-                const response = await fetch('https://your-backend-url.com/chat', {
+                // Send message to backend
+                const response = await fetch('http://127.0.0.1:8000/chat', { // Use your actual backend URL if deployed
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: userMessage })
                 });
-                
+
                 const data = await response.json();
-                const aiMessage = data.response;
-                
-                // Display AI message
-                const aiDiv = document.createElement('div');
-                aiDiv.classList.add('message', 'ai');
-                aiDiv.textContent = aiMessage;
-                chatBox.appendChild(aiDiv);
-                
+                chatBox.innerHTML += `<p class="message ai"><strong>AI:</strong> ${data.response}</p>`;
+
                 // Scroll chat to bottom
                 chatBox.scrollTop = chatBox.scrollHeight;
             } catch (error) {
                 console.error('Error:', error);
+                chatBox.innerHTML += `<p style="color: red;"><strong>Error:</strong> Unable to fetch response.</p>`;
             }
         }
     </script>
