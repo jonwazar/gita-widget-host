@@ -87,7 +87,7 @@
 
             try {
                 // Send message to backend
-                const response = await fetch('http://127.0.0.1:8000/chat', { // Use your actual backend URL if deployed
+                const response = await fetch('https://chat-backend.onrender.com/chat', { // Use your actual backend URL if deployed
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: userMessage })
