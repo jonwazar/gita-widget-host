@@ -11,7 +11,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            background-color: #f8f9fa;
+            background-color: white;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -38,18 +38,21 @@
 
         /* User messages (aligned right) */
         .user-message {
-            background-color: #007bff;
+            background-color: #00B8CD;
             color: white;
             align-self: flex-end;
             max-width: 75%;
         }
 
-        /* Bot messages (full width) */
+        /* Bot messages (full width, cleaner look) */
         .bot-message {
-            background-color: #e9ecef;
+            background-color: white;
             color: black;
             align-self: flex-start;
             width: 100%;
+            border: 1px solid #00B8CD;
+            padding: 12px;
+            border-radius: 8px;
         }
 
         /* Table formatting */
@@ -74,7 +77,7 @@
         }
 
         .result-table th {
-            background-color: #007bff;
+            background-color: #00B8CD;
             color: white;
             font-weight: bold;
         }
@@ -89,7 +92,7 @@
             padding: 10px;
             display: flex;
             align-items: center;
-            border-top: 1px solid #ddd;
+            border-top: 2px solid #00B8CD;
             height: 70px;
         }
 
@@ -101,6 +104,18 @@
             border-radius: 5px;
             padding: 10px;
             overflow-y: auto;
+            border: 2px solid #00B8CD;
+        }
+
+        /* Styled button */
+        .btn-primary {
+            background-color: #00B8CD;
+            border-color: #00B8CD;
+        }
+
+        .btn-primary:hover {
+            background-color: #0097A7;
+            border-color: #0097A7;
         }
 
         /* Loading indicator */
@@ -112,7 +127,7 @@
 </head>
 <body>
 
-    <h2 class="text-center my-3">GITA SQL Query Interface</h2>
+    <h2 class="text-center my-3" style="color: #00B8CD;">GITA SQL Query Interface</h2>
 
     <div id="chatContainer" class="p-3 border"></div>
 
@@ -122,7 +137,7 @@
     </div>
 
     <div class="loading mt-2" id="loadingSpinner">
-        <span class="spinner-border spinner-border-sm"></span> Processing...
+        <span class="spinner-border spinner-border-sm" style="color: #00B8CD;"></span> Processing...
     </div>
 
     <script>
@@ -196,7 +211,7 @@
             // Get column names
             const columns = Object.keys(data[0]);
             columns.forEach(col => {
-                tableHTML += `<th>${columnMappings[col] || col.replace(/_/g, ' ')}</th>`; // Replace underscores with spaces if not mapped
+                tableHTML += `<th>${columnMappings[col] || col.replace(/_/g, ' ')}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
 
