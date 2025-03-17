@@ -6,48 +6,88 @@
     <title>GITA SQL Query Interface</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body {
+        /* Ensure full-screen chat experience */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
             background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Chat container takes full height, pushing input to the bottom */
         #chatContainer {
-            max-height: 500px;
+            flex-grow: 1;
             overflow-y: auto;
             padding: 10px;
-            border-radius: 5px;
             background: white;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* User and bot messages */
         .user-message, .bot-message {
-            padding: 8px 12px;
+            padding: 10px;
             margin: 6px 0;
-            border-radius: 8px;
-            max-width: 80%;
+            border-radius: 10px;
+            word-wrap: break-word;
         }
+
+        /* User messages (aligned right) */
         .user-message {
             background-color: #007bff;
             color: white;
             align-self: flex-end;
+            max-width: 75%;
         }
+
+        /* Bot messages (full width) */
         .bot-message {
             background-color: #e9ecef;
             color: black;
             align-self: flex-start;
+            width: 100%;
         }
+
+        /* Fixed input bar at the bottom */
+        .input-area {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Multi-line input */
+        #queryInput {
+            flex: 1;
+            height: 50px; /* 2 lines default */
+            resize: none;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        /* Loading indicator */
         .loading {
-            display: none;
             text-align: center;
+            display: none;
         }
     </style>
 </head>
-<body class="container mt-4">
+<body>
 
-    <h2 class="text-center mb-3">GITA SQL Query Interface</h2>
+    <h2 class="text-center my-3">GITA SQL Query Interface</h2>
 
     <div id="chatContainer" class="p-3 border"></div>
 
-    <div class="input-group mt-3">
-        <input type="text" id="queryInput" class="form-control" placeholder="Ask me a question related to Rep performance...." onkeydown="handleKeyPress(event)">
-        <button class="btn btn-primary" onclick="sendQuery()">Send</button>
-        <button class="btn btn-secondary" onclick="clearChat()">Clear</button>
+    <div class="input-area">
+        <textarea id="queryInput" class="form-control" placeholder="Ask me a question related to Rep performance...." onkeydown="handleKeyPress(event)"></textarea>
+        <button class="btn btn-primary ms-2" onclick="sendQuery()">Send</button>
     </div>
 
     <div class="loading mt-2" id="loadingSpinner">
@@ -76,7 +116,7 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById("loadingSpinner").style.display = "none";
-                
+
                 const botMessage = document.createElement("div");
                 botMessage.className = "bot-message";
                 botMessage.innerHTML = `<strong>SQL:</strong> <br> <code>${data.sql}</code> <br><br> <strong>Result:</strong> <br> <pre>${JSON.stringify(data.result, null, 2)}</pre>`;
@@ -96,13 +136,10 @@
         }
 
         function handleKeyPress(event) {
-            if (event.key === "Enter") {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
                 sendQuery();
             }
-        }
-
-        function clearChat() {
-            document.getElementById("chatContainer").innerHTML = "";
         }
     </script>
 
