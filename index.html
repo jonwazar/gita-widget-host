@@ -14,9 +14,10 @@
             background-color: #f8f9fa;
             display: flex;
             flex-direction: column;
+            overflow: hidden; /* Prevents scrolling of the whole page */
         }
 
-        /* Chat container takes full height, pushing input to the bottom */
+        /* Chat container takes full height but allows scrolling */
         #chatContainer {
             flex-grow: 1;
             overflow-y: auto;
@@ -24,6 +25,7 @@
             background: white;
             display: flex;
             flex-direction: column;
+            margin-bottom: 70px; /* Ensures chat messages don't overlap with the input */
         }
 
         /* User and bot messages */
@@ -61,6 +63,7 @@
             display: flex;
             align-items: center;
             border-top: 1px solid #ddd;
+            height: 70px; /* Keeps input box height consistent */
         }
 
         /* Multi-line input */
@@ -70,6 +73,7 @@
             resize: none;
             border-radius: 5px;
             padding: 10px;
+            overflow-y: auto; /* Allows the user to type long messages */
         }
 
         /* Loading indicator */
