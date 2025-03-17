@@ -5,43 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GITA SQL Query Interface</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        #chatContainer {
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 10px;
+            border-radius: 5px;
+            background: white;
+        }
+        .user-message, .bot-message {
+            padding: 8px 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: #e9ecef;
+            color: black;
+            align-self: flex-start;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+        }
+    </style>
 </head>
-<body class="container mt-5">
+<body class="container mt-4">
 
-    <h2 class="text-center">GITA SQL Query Interface</h2>
-    
-    <div class="mb-3">
-        <label for="queryInput" class="form-label">Enter your query:</label>
-        <input type="text" id="queryInput" class="form-control" placeholder="e.g., Show me the top 5 case managers by converted cases in 2024">
+    <h2 class="text-center mb-3">GITA SQL Query Interface</h2>
+
+    <div id="chatContainer" class="p-3 border"></div>
+
+    <div class="input-group mt-3">
+        <input type="text" id="queryInput" class="form-control" placeholder="Ask a SQL-based question..." onkeydown="handleKeyPress(event)">
+        <button class="btn btn-primary" onclick="sendQuery()">Send</button>
+        <button class="btn btn-secondary" onclick="clearChat()">Clear</button>
     </div>
-    
-    <button class="btn btn-primary w-100" onclick="sendQuery()">Submit</button>
-    
-    <h4 class="mt-4">Generated SQL:</h4>
-    <pre id="sqlOutput" class="bg-light p-3 border"></pre>
-    
-    <h4 class="mt-3">Query Results:</h4>
-    <pre id="resultOutput" class="bg-light p-3 border"></pre>
+
+    <div class="loading mt-2" id="loadingSpinner">
+        <span class="spinner-border spinner-border-sm"></span> Processing...
+    </div>
 
     <script>
         function sendQuery() {
-            const query = document.getElementById("queryInput").value;
-            const apiUrl = "https://api.jwaapps.ai/query"; // Update with your Flask API endpoint
+            const query = document.getElementById("queryInput").value.trim();
+            if (!query) return;
 
-            fetch(apiUrl, {
+            const chatContainer = document.getElementById("chatContainer");
+            const userMessage = document.createElement("div");
+            userMessage.className = "user-message";
+            userMessage.textContent = query;
+            chatContainer.appendChild(userMessage);
+
+            document.getElementById("queryInput").value = "";
+            document.getElementById("loadingSpinner").style.display = "block";
+
+            fetch("https://api.jwaapps.ai/query", {  // Update with your Flask API
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query: query })
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("sqlOutput").textContent = data.sql;
-                document.getElementById("resultOutput").textContent = JSON.stringify(data.result, null, 2);
+                document.getElementById("loadingSpinner").style.display = "none";
+                
+                const botMessage = document.createElement("div");
+                botMessage.className = "bot-message";
+                botMessage.innerHTML = `<strong>SQL:</strong> <br> <code>${data.sql}</code> <br><br> <strong>Result:</strong> <br> <pre>${JSON.stringify(data.result, null, 2)}</pre>`;
+                chatContainer.appendChild(botMessage);
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;  // Auto-scroll to latest message
             })
             .catch(error => {
-                console.error("Error:", error);
-                document.getElementById("resultOutput").textContent = "Error connecting to the server.";
+                document.getElementById("loadingSpinner").style.display = "none";
+
+                const errorMessage = document.createElement("div");
+                errorMessage.className = "bot-message";
+                errorMessage.style.color = "red";
+                errorMessage.innerHTML = "⚠️ Error: Unable to connect to the server.";
+                chatContainer.appendChild(errorMessage);
             });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendQuery();
+            }
+        }
+
+        function clearChat() {
+            document.getElementById("chatContainer").innerHTML = "";
         }
     </script>
 
