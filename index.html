@@ -95,7 +95,7 @@
             align-items: center;
             border-top: 2px solid #00B8CD;
             height: 70px;
-            z-index: 1000; /* Ensures it stays on top */
+            z-index: 1000;
         }
 
         /* Multi-line input */
@@ -109,7 +109,7 @@
             border: 2px solid #00B8CD;
         }
 
-        /* Styled button */
+        /* Styled buttons */
         .btn-primary {
             background-color: #00B8CD;
             border-color: #00B8CD;
@@ -118,6 +118,16 @@
         .btn-primary:hover {
             background-color: #0097A7;
             border-color: #0097A7;
+        }
+
+        .btn-secondary {
+            background-color: #ddd;
+            border-color: #ccc;
+            color: black;
+        }
+
+        .btn-secondary:hover {
+            background-color: #ccc;
         }
 
         /* Loading indicator */
@@ -136,6 +146,7 @@
     <div class="input-area">
         <textarea id="queryInput" class="form-control" placeholder="Ask me a question related to Rep performance...." onkeydown="handleKeyPress(event)"></textarea>
         <button class="btn btn-primary ms-2" onclick="sendQuery()">Send</button>
+        <button class="btn btn-secondary ms-2" onclick="clearChat()">Clear</button>
     </div>
 
     <div class="loading mt-2" id="loadingSpinner">
@@ -228,6 +239,10 @@
 
             tableHTML += '</tbody></table></div>';
             return tableHTML;
+        }
+
+        function clearChat() {
+            document.getElementById("chatContainer").innerHTML = "";
         }
 
         function handleKeyPress(event) {
