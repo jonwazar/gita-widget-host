@@ -17,7 +17,7 @@
             overflow: hidden;
         }
 
-        /* Chat container fills remaining space */
+        /* Chat container */
         #chatContainer {
             flex-grow: 1;
             overflow-y: auto;
@@ -27,45 +27,53 @@
             scroll-behavior: smooth;
         }
 
-        /* User and bot messages */
-        .user-message, .bot-message {
-            padding: 8px 12px;
-            margin: 4px 0;
-            border-radius: 10px;
-            word-wrap: break-word;
+        /* Chat message structure */
+        .chat-message {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
             font-size: 15px;
             line-height: 1.5;
         }
 
+        /* User message with vertical indicator */
         .user-message {
-            background-color: #00B8CD;
-            color: white;
-            align-self: flex-end;
-            max-width: 75%;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
         }
 
+        .user-message::before {
+            content: "";
+            width: 6px;
+            height: 16px;
+            background-color: #00B8CD;
+            display: inline-block;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+
+        /* Bot response formatting */
         .bot-message {
             background-color: white;
             color: black;
-            align-self: flex-start;
-            width: auto;
             padding: 6px 12px;
+            border-radius: 8px;
         }
 
-        /* SQL text in blue */
+        /* SQL text formatting */
         .sql-text {
             color: #007bff;
             font-weight: bold;
             font-family: monospace;
         }
 
-        /* Progress Indicator (loading dots) */
+        /* Progress Indicator (blinking dots) */
         .loading-indicator {
             display: flex;
             align-items: center;
             gap: 5px;
             margin-top: 5px;
-            align-self: flex-start;
             padding-left: 10px;
         }
 
@@ -77,13 +85,8 @@
             animation: blink 1.4s infinite;
         }
 
-        .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes blink {
             0% { opacity: 0.3; }
@@ -91,7 +94,7 @@
             100% { opacity: 0.3; }
         }
 
-        /* Fixed input bar at the bottom */
+        /* Fixed input bar */
         .input-area {
             position: fixed;
             bottom: 0;
@@ -105,7 +108,7 @@
             z-index: 1000;
         }
 
-        /* Input wrapper (to hold buttons inside) */
+        /* Input wrapper */
         .input-wrapper {
             display: flex;
             align-items: center;
@@ -116,10 +119,10 @@
             padding: 6px;
         }
 
-        /* Bigger Multi-line input */
+        /* Multi-line input */
         #queryInput {
             flex: 1;
-            height: 50px;
+            height: 65px;
             resize: none;
             border: none;
             font-size: 16px;
@@ -128,7 +131,7 @@
             outline: none;
         }
 
-        /* Styled buttons inside input field */
+        /* Buttons */
         .btn-input {
             background: none;
             border: none;
@@ -147,7 +150,7 @@
             width: 100%;
             overflow-x: auto;
             margin-top: 10px;
-            padding-bottom: 80px; /* Extra bottom padding for spacing */
+            padding-bottom: 80px;
         }
 
         .styled-table {
@@ -155,7 +158,7 @@
             border-collapse: collapse;
             border-radius: 8px;
             overflow: hidden;
-            border: 3px solid #666 !important; /* FORCE apply visible border */
+            border: 3px solid #666 !important;
         }
 
         .styled-table thead {
@@ -167,7 +170,7 @@
         .styled-table th, .styled-table td {
             padding: 10px;
             text-align: left;
-            border-bottom: 1px solid #ccc; /* Slightly darker border */
+            border-bottom: 1px solid #ccc;
             border-right: 1px solid #ccc;
         }
 
@@ -194,7 +197,7 @@
 
     <div class="input-area">
         <div class="input-wrapper">
-            <textarea id="queryInput" class="form-control" placeholder="Ask me a question about Rep performance..." onkeydown="handleKeyPress(event)"></textarea>
+            <textarea id="queryInput" class="form-control" onkeydown="handleKeyPress(event)"></textarea>
             <button class="btn-input" onclick="sendQuery()" title="Send"><i class="fas fa-paper-plane"></i></button>
             <button class="btn-input" onclick="clearChat()" title="Clear Chat"><i class="fas fa-sync-alt"></i></button>
         </div>
@@ -209,8 +212,8 @@
 
             // Append user message
             const userMessage = document.createElement("div");
-            userMessage.className = "user-message";
-            userMessage.textContent = query;
+            userMessage.className = "chat-message user-message";
+            userMessage.innerHTML = `<strong>You:</strong> ${query}`;
             chatContainer.appendChild(userMessage);
 
             document.getElementById("queryInput").value = "";
@@ -231,7 +234,7 @@
             .then(data => {
                 loadingIndicator.remove();
                 const botMessage = document.createElement("div");
-                botMessage.className = "bot-message";
+                botMessage.className = "chat-message bot-message";
                 botMessage.innerHTML = `<strong>SQL:</strong> <br> <code class="sql-text">${data.sql}</code><br>
                                         <strong>Results:</strong> <br> <pre>${JSON.stringify(data.result, null, 2)}</pre>
                                         <strong>Table:</strong><br><div class="table-container">${generateTable(data.result)}</div>`;
@@ -247,6 +250,13 @@
             let rows = data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join("")}</tr>`).join("");
 
             return `<table class="styled-table"><thead><tr>${headers}</tr></thead><tbody>${rows}</tbody></table>`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendQuery();
+            }
         }
 
         function scrollToBottom() {
