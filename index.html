@@ -8,13 +8,13 @@
     <style>
         /* Ensure full-screen chat experience */
         html, body {
-            height: 100%;
+            height: 100vh; /* Full viewport height */
             margin: 0;
             padding: 0;
             background-color: white;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow: hidden; /* Prevent scrolling of entire page */
         }
 
         /* Chat container fills remaining space */
@@ -25,8 +25,11 @@
             background: white;
             display: flex;
             flex-direction: column;
-            margin-bottom: 70px;
-            padding-bottom: 80px; /* Extra padding to prevent overlap */
+        }
+
+        /* Ensures last message isn't hidden behind input */
+        .chat-messages {
+            padding-bottom: 80px; /* Leaves space for input box */
         }
 
         /* User and bot messages */
@@ -98,6 +101,14 @@
             z-index: 1000;
         }
 
+        /* Ensures input is always visible */
+        @media screen and (max-width: 768px) {
+            .input-area {
+                height: auto;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+        }
+
         /* Multi-line input */
         #queryInput {
             flex: 1;
@@ -141,7 +152,9 @@
 
     <h2 class="text-center my-3" style="color: #00B8CD;">GITA SQL Query Interface</h2>
 
-    <div id="chatContainer" class="p-3 border"></div>
+    <div id="chatContainer" class="p-3 border">
+        <div class="chat-messages"></div>
+    </div>
 
     <div class="input-area">
         <textarea id="queryInput" class="form-control" placeholder="Ask me a question related to Rep performance...." onkeydown="handleKeyPress(event)"></textarea>
@@ -158,7 +171,7 @@
             const query = document.getElementById("queryInput").value.trim();
             if (!query) return;
 
-            const chatContainer = document.getElementById("chatContainer");
+            const chatContainer = document.querySelector(".chat-messages");
             const userMessage = document.createElement("div");
             userMessage.className = "user-message";
             userMessage.textContent = query;
@@ -182,7 +195,6 @@
                 let responseHTML = `<strong>SQL:</strong> <br> <code>${data.sql}</code><br><br>`;
                 responseHTML += `<strong>Results (JSON):</strong> <br> <pre>${JSON.stringify(data.result, null, 2)}</pre>`;
 
-                // If results exist, display as a table
                 if (data.result && data.result.length > 0) {
                     responseHTML += `<strong>Table:</strong> ${generateTable(data.result)}`;
                 } else {
@@ -205,30 +217,13 @@
         }
 
         function generateTable(data) {
-            if (!data.length) return "<strong>No data available</strong>";
-
             let tableHTML = '<div class="table-container"><table class="result-table"><thead><tr>';
-
-            // Convert system column names to human-readable format
-            const columnMappings = {
-                "rep_name": "Rep Name",
-                "converted_cases": "Converted Cases",
-                "total_cases": "Total Cases",
-                "cpr": "Cost Per Rep",
-                "performance_score": "Performance Score",
-                "region": "Region",
-                "team": "Team",
-                "pod": "POD"
-            };
-
-            // Get column names
             const columns = Object.keys(data[0]);
             columns.forEach(col => {
-                tableHTML += `<th>${columnMappings[col] || col.replace(/_/g, ' ')}</th>`;
+                tableHTML += `<th>${col.replace(/_/g, ' ')}</th>`;
             });
             tableHTML += '</tr></thead><tbody>';
 
-            // Populate rows
             data.forEach(row => {
                 tableHTML += '<tr>';
                 columns.forEach(col => {
@@ -242,7 +237,7 @@
         }
 
         function clearChat() {
-            document.getElementById("chatContainer").innerHTML = "";
+            document.querySelector(".chat-messages").innerHTML = "";
         }
 
         function handleKeyPress(event) {
